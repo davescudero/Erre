@@ -1,0 +1,131 @@
+---
+title: "Aplicación de Dados con Shiny"
+author: "@davescudero"
+date: "15 de septiembre de 2023"
+output: html_document
+---
+
+## Introducción
+
+En este reporte, describiremos la creación de una aplicación Shiny para simular el lanzamiento de dados. La aplicación permite al usuario seleccionar entre un dado regular y un dado cargado. A través de este proyecto, exploraremos conceptos básicos de programación en R y estadísticas.
+
+## Desarrollo y Código
+
+La aplicación se desarrolló usando el paquete `shiny` de R. A continuación, se presentan los componentes clave del código:
+
+### 1. Configuración inicial
+
+Antes de cualquier proyecto en R, es vital asegurarse de que todas las bibliotecas necesarias estén instaladas y cargadas.
+
+```{r setup, echo=TRUE, results='hide'}
+install.packages("shiny", repos='http://cran.us.r-project.org')
+```
+### 2. Desarrollo de la aplicación
+
+La aplicación consta de dos componentes principales: la interfaz de usuario (UI) y la lógica del servidor.
+
+1. **Interfaz de usuario (UI)**:
+La UI es el componente que define cómo se ve la aplicación y cómo el usuario interactúa con ella. En otras palabras, es la "cara" de la aplicación.
+
+Componentes clave de la UI:
+
+- Diseño y estructura: Define cómo se organizan y presentan visualmente los elementos en la aplicación. Ejemplos de funciones que definen la estructura son `fluidPage`, `sidebarLayout`, `sidebarPanel` y `mainPanel`.
+
+- Entradas: Son elementos interactivos que permiten al usuario proporcionar información o ajustar parámetros. Algunos ejemplos son `textInput` (para introducir texto), `sliderInput` (para seleccionar un valor de un rango), `selectInput` (para seleccionar de una lista de opciones), etc.
+
+- Salidas: Reservan un espacio en la UI donde se mostrarán los resultados generados por el servidor. Por ejemplo, `textOutput` muestra texto, `plotOutput` muestra gráficos, etc.
+
+2. **Lógica del servidor (Server)**:
+El servidor es el "cerebro" de la aplicación. Maneja el procesamiento de datos, ejecuta el código de R y genera las salidas que se mostrarán en la UI.
+
+Componentes clave del servidor:
+
+- Funciones reactivas: Estas son funciones especiales que "escuchan" cambios en las entradas y recomputan su contenido en consecuencia. Un ejemplo es reactive.
+
+- Observadores: Estas funciones "observan" y reaccionan a eventos o cambios en las entradas. Un ejemplo común es `observeEvent`, que escucha eventos específicos, como hacer clic en un botón.
+
+- Renderización: Las funciones de renderización preparan el contenido para ser mostrado en la UI. Por ejemplo, renderText prepara el texto para ser mostrado por `textOutput` en la UI.
+
+**Flujo de trabajo básico*:
+
+1. El usuario interactúa con un elemento de entrada en la UI (por ejemplo, selecciona un valor de una lista desplegable).
+2. Esta interacción dispara una función reactiva en el servidor.
+3. El servidor procesa la información según la lógica definida y utiliza funciones de renderización para preparar la salida.
+4. La salida se muestra en el espacio reservado en la UI.
+
+## app
+
+```{r include=FALSE}
+library(shiny)
+library(ggplot2)
+
+ui <- fluidPage(
+  titlePanel("Análisis de Dados Ponderados"),
+  
+  sidebarLayout(
+    sidebarPanel(
+      numericInput("n", "Número de simulaciones:", 10000, min = 1),
+      numericInput("num_dice", "Número de dados:", 2, min = 2, max = 10), # Ajusta el máximo como desees.
+      actionButton("go", "Simular")
+    ),
+    
+    mainPanel(
+      plotOutput("dicePlot")
+    )
+  )
+)
+
+```
+```{r}
+server <- function(input, output) {
+  
+  roll <- function(num_dice) {
+    die <- 1:6
+    dice <- sample(die, size = num_dice, replace = TRUE, prob = c(1/8, 1/8, 1/8, 1/8, 1/8, 3/8))
+    sum(dice)
+  }
+  
+  observeEvent(input$go, {
+    rolls <- replicate(input$n, roll(input$num_dice))
+    
+    output$dicePlot <- renderPlot({
+      ggplot(data.frame(rolls), aes(x = rolls)) + 
+        geom_histogram(binwidth = 1) + 
+        labs(title = "Distribución de Sumas de Dados Ponderados",
+             x = "Suma de Dados",
+             y = "Frecuencia") + 
+        theme_minimal()
+    })
+  })
+}
+
+```
+```{r}
+shinyApp(ui = ui, server = server)
+
+```
+## Estadística
+Cuando consideramos el lanzamiento de dados tradicionales, cada número tiene una probabilidad uniforme de $1/6$. Sin embargo, el dado se encuentra ponderado, lo que significa que la probabilidad no está uniformemente distribuida entre los números del $1$ al $6$.
+
+La probabilidad de sacar un número del $1$ al $5$ es de $1/8$, mientras que la probabilidad de obtener un $6$ es de $3/8$. Esta distribución es intencional y tiene consecuencias notables en los resultados de lanzar los dados repetidamente.
+
+Desde una **perspectiva frecuentista**, si lanzáramos estos dados un número infinitamente grande de veces, veríamos que el número $6$ aparecería con una frecuencia de $3/8$ mientras que los números $1$ al $5$ aparecerían con una frecuencia de $1/8$ cada uno. Sin embargo, en cualquier muestra finita (como $10$, $100$ o $10000$ lanzamientos), aunque es probable que veamos una sobre-representación del número $6$, las proporciones exactas pueden variar debido a la aleatoriedad inherente en cada tirada.
+
+Desde un **punto de vista práctico**, este fenómeno es una ilustración perfecta de cómo el sesgo o la ponderación pueden influir en muestras aleatorias. En análisis de datos, estos sesgos son críticos y pueden surgir de maneras muy sutiles, a menudo sin que el analista se dé cuenta en observaciones a corto plazo. Reconocer y ajustar por estos sesgos es esencial para la inferencia estadística precisa.
+
+En resumen, aunque cada lanzamiento de los dados ponderados parece aleatorio y justo, la estructura subyacente de las probabilidades garantiza que, a largo plazo, ciertos resultados (en este caso, el número $6$) serán sistemáticamente más comunes que otros. Esta es una lección valiosa sobre la naturaleza y el reconocimiento del sesgo en cualquier conjunto de datos.
+
+**Cuando agregas más dados al lanzamiento**, la distribución de las sumas cambia debido a la naturaleza combinatoria de los posibles resultados y al **principio central del límite**.
+
+### Combinatoria y Distribución
+
+Si lanzas un solo dado, la distribución es uniforme: cada número del $1$ al $6$ tiene igual probabilidad de aparecer.
+Si lanzas dos dados, ya no puedes obtener un $1$ como resultado de la suma. La suma más pequeña sería un $2$ (si ambos dados muestran un $1$) y la suma más grande sería un $12$ (si ambos dados muestran un $6$). Además, hay muchas más formas de obtener una suma de $7$ ($1+6$, $2+5$, $3+4$, $4+3$, $5+2$, $6+1$) que una suma de $2$ o $12$ (que solo tienen una combinación posible: $1+1$ y $6+6$, respectivamente). Por lo tanto, la distribución ya no es uniforme; en cambio, tiene un pico alrededor del $7$.
+A medida que agregas más dados, hay aún más combinaciones posibles para cada suma y la forma de la distribución cambia aún más.
+
+### Teorema del Límite Central (TLC):
+
+El Teorema del Límite Central establece que, en muchas situaciones, cuando se suman un gran número de variables aleatorias independientes y idénticamente distribuidas (i.i.d.), su suma total tiende a seguir una distribución normal o gaussiana, independientemente de la forma original de la distribución de esas variables.
+En el caso de lanzar dados, si lanzas un gran número de ellos y sumas sus resultados, la distribución de esa suma tenderá a parecerse más a una distribución gaussiana o campana de Gauss.
+Por lo tanto, a medida que agregas más dados, te acercas más a esta distribución normal.
+En resumen, al agregar más dados, estás sumando más variables aleatorias. Inicialmente, esto aumenta el rango de sumas posibles y cambia la distribución debido a las diferentes combinaciones de resultados. A medida que continúas agregando más y más dados, la distribución tiende a volverse gaussiana debido al Teorema del Límite Central. Esta transición a una forma gaussiana es una manifestación poderosa y fundamental de la teoría de la probabilidad.
