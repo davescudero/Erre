@@ -1,9 +1,14 @@
 ---
-title: "Aplicación de Dados con Shiny"
-author: "@davescudero"
-date: "15 de septiembre de 2023"
+title: "Dice_app_code"
+author: '@davescudero'
+date: "2023-09-16"
 output: html_document
+runtime: shiny
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
 ## Introducción
 
@@ -17,7 +22,7 @@ La aplicación se desarrolló usando el paquete `shiny` de R. A continuación, s
 
 Antes de cualquier proyecto en R, es vital asegurarse de que todas las bibliotecas necesarias estén instaladas y cargadas.
 
-```{r setup, echo=TRUE, results='hide'}
+```{r}
 install.packages("shiny", repos='http://cran.us.r-project.org')
 ```
 ### 2. Desarrollo de la aplicación
@@ -27,7 +32,7 @@ La aplicación consta de dos componentes principales: la interfaz de usuario (UI
 1. **Interfaz de usuario (UI)**:
 La UI es el componente que define cómo se ve la aplicación y cómo el usuario interactúa con ella. En otras palabras, es la "cara" de la aplicación.
 
-Componentes clave de la UI:
+  Componentes clave de la UI:
 
 - Diseño y estructura: Define cómo se organizan y presentan visualmente los elementos en la aplicación. Ejemplos de funciones que definen la estructura son `fluidPage`, `sidebarLayout`, `sidebarPanel` y `mainPanel`.
 
@@ -38,7 +43,7 @@ Componentes clave de la UI:
 2. **Lógica del servidor (Server)**:
 El servidor es el "cerebro" de la aplicación. Maneja el procesamiento de datos, ejecuta el código de R y genera las salidas que se mostrarán en la UI.
 
-Componentes clave del servidor:
+  Componentes clave del servidor:
 
 - Funciones reactivas: Estas son funciones especiales que "escuchan" cambios en las entradas y recomputan su contenido en consecuencia. Un ejemplo es reactive.
 
@@ -46,7 +51,7 @@ Componentes clave del servidor:
 
 - Renderización: Las funciones de renderización preparan el contenido para ser mostrado en la UI. Por ejemplo, renderText prepara el texto para ser mostrado por `textOutput` en la UI.
 
-**Flujo de trabajo básico*:
+**Flujo de trabajo básico**:
 
 1. El usuario interactúa con un elemento de entrada en la UI (por ejemplo, selecciona un valor de una lista desplegable).
 2. Esta interacción dispara una función reactiva en el servidor.
