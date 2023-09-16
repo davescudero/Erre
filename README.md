@@ -1,7 +1,6 @@
 # Erre 📊
 
-![Portada con 
-R](https://media.giphy.com/media/rGlAZysKBcjRCkAX7S/giphy.gif)
+
 
 Espacio dedicado a mi aprendizaje del lenguaje de programación R. Aquí encontrarás desde los fundamentos básicos de R hasta ejercicios avanzados de estadística y técnicas de remuestreo.
 
