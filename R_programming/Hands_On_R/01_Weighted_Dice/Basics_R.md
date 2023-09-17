@@ -55,11 +55,12 @@ die / 2
 die * die
 ## 1  4  9 16 25 36
 ```
+
 R no siempre sigue las reglas de la multiplicación de matrices. En lugar de eso, R utiliza ejecución [elemento a elemento](Background/multiplicacion_por_elemento.md). Cuando manipulas un conjunto de números, R aplicará la misma operación a cada elemento del conjunto. Así que, por ejemplo, cuando ejecutas `die - 1`, R resta uno a cada elemento de `die`.
 
 Cuando usas dos o más vectores en una operación, R alineará los vectores y realizará una secuencia de operaciones individuales. Por ejemplo, cuando ejecutas `die * die`, R alinea los dos vectores `die` y luego multiplica el primer elemento del vector 1 por el primer elemento del vector 2. Luego, R multiplica el segundo elemento del vector 1 por el segundo elemento del vector 2, y así sucesivamente, hasta que cada elemento haya sido multiplicado. El resultado será un nuevo vector del mismo tamaño que los dos primeros.
 
-Dados dos vectores, $$V= [v_1, v_2, \dots, v_n]$$ y $$W= [w_1, w_2, \dots, w_n]$$ 
+Dados dos vectores, $$V= [v_1, v_2, \dots, v_n]$$ y $$W= [w_1, w_2, \dots, w_n]$$
 el resultado de su multiplicación elemento por elemento es:
 $$ r = [v_1 \times w_1, v_2 \times w_2, \dots, v_n \times w_n] $$
 
@@ -121,6 +122,71 @@ Cuando enlazas funciones juntas, R las resolverá desde la operación más inter
 
 Dado que tenemos dos funciones $f$  y $g$, la composición $f(g(x))$ se resuelve primero evaluando $g(x)$ y luego  $f$ sobre el resultado.
 
-
 $$f(g(x)) = f\left( \underbrace{g(x)}_{\text{operación interna}} \right) \quad \text{operación externa}$$
 
+Por suerte para nosotros, hay una función en R que puede ayudar a "lanzar" el dado. Puedes simular un lanzamiento del dado con la función `sample` de R. `sample` toma dos argumentos: un vector llamado `x` y un número llamado `size`. `sample` devolverá `size` elementos del vector:
+
+```R
+sample(x = 1:4, size = 2)
+## 3 2
+```
+
+Para lanzar tu dado y obtener un número, establece `x` a `die` y toma un elemento de él. Obtendrás un nuevo número cada vez que lo lances:
+
+```R
+sample(x = die, size = 1)
+## 2
+
+sample(x = die, size = 1)
+## 1
+
+sample(x = die, size = 1)
+## 6
+```
+
+Muchas funciones en R toman múltiples argumentos que les ayudan a realizar su trabajo. Puedes darle a una función tantos argumentos como quieras siempre y cuando separes cada argumento con una coma.
+
+Cada argumento en cada función de R tiene un nombre. Puedes especificar qué datos deben ser asignados a qué argumento estableciendo un nombre igual a datos, como en el código anterior. Esto se vuelve importante a medida que comienzas a pasar múltiples argumentos a la misma función; los nombres te ayudan a evitar pasar los datos incorrectos al argumento equivocado. Sin embargo, usar nombres es opcional.
+
+```R
+sample(die, size = 1)
+## 2
+```
+
+A menudo, el nombre del primer argumento no es muy descriptivo, y generalmente es obvio a qué se refiere el primer dato.
+
+¿Pero cómo sabes qué nombres de argumentos usar?
+
+Puedes consultar los argumentos de la función con `args`. Para hacerlo, coloca el nombre de la función entre los paréntesis detrás de `args`. Por ejemplo, puedes ver que la función `round` toma dos argumentos, uno llamado `x` y otro llamado `digits`:
+
+```R
+args(round)
+## function (x, digits = 0) 
+## NULL
+```
+
+¿Notaste que `args` muestra que el argumento `digits` de `round` ya está establecido en 0? Frecuentemente, una función de R tomará argumentos opcionales como `digits`. Estos argumentos se consideran opcionales porque vienen con un valor predeterminado. Puedes pasar un nuevo valor a un argumento opcional si lo deseas, y R usará el valor predeterminado si no lo haces. Por ejemplo, `round` redondeará tu número a 0 decimales por defecto. Para anular el valor predeterminado, proporciona tu propio valor para `digits`:
+
+```R
+round(3.1415)
+## 3
+
+round(3.1415, digits = 2)
+## 3.14
+```
+
+Debes escribir los nombres de cada argumento después del primero o segundo cuando llames a una función con múltiples argumentos.
+
+Si no escribes los nombres de tus argumentos, R coincidirá con tus valores con los argumentos de tu función por orden. Por ejemplo, en el siguiente código, el primer valor, `die`, coincidirá con el primer argumento de `sample`, que se llama `x`. El siguiente valor, `1`, coincidirá con el siguiente argumento, `size`:
+
+```R
+sample(die, 1)
+## 2
+```
+
+A medida que proporciones más argumentos, es más probable que tu orden y el orden de R no coincidan. Como resultado, los valores pueden pasar al argumento equivocado. Los nombres de argumentos evitan esto. R siempre coincidirá con un valor con su nombre de argumento, sin importar dónde aparezca en el orden de argumentos:
+
+```R
+sample(size = 1, x = die)
+## 2
+```
