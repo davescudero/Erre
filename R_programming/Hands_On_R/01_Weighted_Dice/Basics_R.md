@@ -2,18 +2,18 @@
 
 ## Project 01: Weighted Dice
 
-### Objects
+### Objetos
 
-The `:`` operator returns its results as a vector, a one-dimensional set of numbers:
+El operador `:` devuelve sus resultados como un vector, un conjunto unidimensional de números:
 
 ```r
 1:6
 # 1 2 3 4 5 6 
 ```
 
-Running `1:6` generated a vector of numbers for you to see, but it didn’t save that vector anywhere in your computer’s memory.
+Ejecutar `1:6` genera un vector de números para que lo veas, pero no guarda ese vector en ningún lugar de la memoria de la computadora.
 
-If you want to use those numbers again, you’ll have to ask your computer to save them somewhere. You can do that by creating an R object.
+Si quieres usar esos números de nuevo, tendrás que pedirle a la computadora que los guarde en algún lugar. Puedes hacer eso creando un **objeto** en R.
 
 ```r
 a <- 1
@@ -24,18 +24,18 @@ a + 2
 ## 3
 ```
 
-To create an R object, choose a name and then use the less-than symbol, `<`, followed by a minus sign, `-`, to save data into it.
+Para crear un objeto en R, elige un nombre y luego usa el símbolo menor que, `<`, seguido de un signo de menos, `-`, para guardar datos en él.
 
-This combination looks like an arrow, `<-`. R will make an object, give it your name, and store in it whatever follows the arrow. So `a <- 1` stores 1 in an object named a.
+Esta combinación parece que una flecha, `<-`.  creará un objeto, le dará tu nombre y almacenará en él lo que sigue a la flecha. Por lo tanto, `a <- 1` guarda 1 en un objeto llamado a.
 
-You can see which object names you have already used with the function `ls`:
+Puedes ver qué nombres de objetos ya has usado con la función `ls`:
 
 ```r
 ls()
 # "a"       "die"       "my_number"    "name"
 ```
 
-So, for another example, the following code would create an object named die that contains the numbers one through six. To see what is stored in an object, just type the object’s name by itself:
+Entonces, para otro ejemplo, el siguiente código crearía un objeto llamado `die` que contiene los números del uno al seis. Para ver qué está almacenado en un objeto, simplemente escribe el nombre del objeto por sí solo:
 
 ```r
 die <- 1:6
@@ -43,7 +43,7 @@ die
 # 1 2 3 4 5 6 
 ```
 
-R will replace an object with its contents whenever the object’s name appears in a command. So, for example, you can do all sorts of math with the die. Math isn’t so helpful for rolling dice, but manipulating sets of numbers will be your stock and trade as a data scientist. So let’s take a look at how to do that:
+R reemplazará un objeto con su contenido siempre que el nombre del objeto aparezca en un comando. Así que, por ejemplo, puedes hacer todo tipo de cálculos matemáticos con el *dado*. La matemática no es tan útil para lanzar dados, pero manipular conjuntos de números será tu herramienta principal como científico de datos.
 
 ```r
 die - 1
@@ -56,16 +56,15 @@ die * die
 ## 1  4  9 16 25 36
 ```
 
-R does not always follow the rules of matrix multiplication. Instead, R uses element-wise execution. When you manipulate a set of numbers, R will apply the same operation to each element in the set. So for example, when you run `die - 1`, R subtracts one from each element of die.
+R no siempre sigue las reglas de la multiplicación de matrices. En lugar de eso, R utiliza ejecución [elemento a elemento](Background/multiplicacion_por_elemento.md). Cuando manipulas un conjunto de números, R aplicará la misma operación a cada elemento del conjunto. Así que, por ejemplo, cuando ejecutas `die - 1`, R resta uno a cada elemento de `die`.
 
-When you use two or more vectors in an operation, R will line up the vectors and perform a sequence of individual operations. For example, when you run `die * die`, R lines up the two die vectors and then multiplies the first element of vector 1 by the first element of vector 2. R then multiplies the second element of vector 1 by the second element of vector 2, and so on, until every element has been multiplied. The result will be a new vector the same length as the first two. [multiplicacion elemento por elemento](Background/multiplicacion_por_elemento.md)
+Cuando usas dos o más vectores en una operación, R alineará los vectores y realizará una secuencia de operaciones individuales. Por ejemplo, cuando ejecutas `die * die`, R alinea los dos vectores `die` y luego multiplica el primer elemento del vector 1 por el primer elemento del vector 2. Luego, R multiplica el segundo elemento del vector 1 por el segundo elemento del vector 2, y así sucesivamente, hasta que cada elemento haya sido multiplicado. El resultado será un nuevo vector del mismo tamaño que los dos primeros.
 
-
-Dados dos vectores, $$V= [v_1, v_2, \dots, v_n]$$ y $$W= [w_1, w_2, \dots, w_n]$$ 
+Dados dos vectores, $$V= [v_1, v_2, \dots, v_n]$$ y $$W= [w_1, w_2, \dots, w_n]$$
 el resultado de su multiplicación elemento por elemento es:
-$$ \mathbf{r} = [v_1 \times w_1, v_2 \times w_2, \dots, v_n \times w_n] $$
+$$ r = [v_1 \times w_1, v_2 \times w_2, \dots, v_n \times w_n] $$
 
-If you give R two vectors of unequal lengths, R will repeat the shorter vector until it is as long as the longer vector, and then do the math. This isn’t a permanent change–the shorter vector will be its original size after R does the math. If the length of the short vector does not divide evenly into the length of the long vector, R will return a warning message. This behavior is known as vector recycling, and it helps R do element-wise operations:
+Si proporcionas a R dos vectores de longitudes desiguales, R repetirá el vector más corto hasta que sea tan largo como el vector más largo y luego realizará la operación matemática. Este no es un cambio permanente: el vector más corto tendrá su tamaño original después de que R realice la operación. Si la longitud del vector corto no se divide de manera uniforme en la longitud del vector largo, R devolverá un mensaje de advertencia. Este comportamiento es conocido como [reciclaje de vectores](Background/reciclaje_vectores.md) y ayuda a R a realizar operaciones elemento a elemento:
 
 ```r
 1:2
@@ -87,32 +86,9 @@ In die + 1:4 :
   longer object length is not a multiple of shorter object length
 ```
 
-#### Reciclaje de Vectores en R
+Las operaciones elemento a elemento son una característica muy útil en R porque manipulan grupos de valores de manera ordenada. Cuando comiences a trabajar con conjuntos de datos, las operaciones elemento a elemento asegurarán que los valores de una observación o caso solo se emparejen con valores de la misma observación o caso. Las operaciones elemento a elemento también facilitan la escritura de tus propios programas y funciones en R.
 
-Cuando proporcionas a R dos vectores de **longitudes desiguales**, digamos:
-
-$$V= [v_1, v_2, \dots, v_m]$$
-
-y
-
-$$W = [w_1, w_2, \dots, w_n]$$
-donde  $m \neq n$, R actuará de la siguiente manera:
-
-1. **Repetirá el vector más corto** hasta que tenga la misma longitud que el vector más largo. Si \( m < n \), $V$ se extenderá para coincidir con la longitud de $W$, y viceversa.
-
-2. Luego, **realizará la operación matemática** elemento por elemento.
-
-**Nota Importante**: Esta extensión es **temporal**. Es decir, después de realizar la operación, el vector más corto volverá a su tamaño original.
-
-**Advertencia**: Si la longitud del vector más corto no divide de manera exacta la longitud del vector más largo, R mostrará un mensaje de advertencia.
-
-Este comportamiento se conoce como **reciclaje de vectores** y permite a R realizar operaciones elemento por elemento de manera eficiente.
-
-#### Element wise operations
-
-Element-wise operations are a very useful feature in R because they manipulate groups of values in an orderly way. When you start working with data sets, element-wise operations will ensure that values from one observation or case are only paired with values from the same observation or case. Element-wise operations also make it easier to write your own programs and functions in R.
-
-Fo traditional matrix multiplication, you can do inner multiplication with the `%*%` operator and outer multiplication with the `%o%` operator:
+Para la multiplicación tradicional de matrices, puedes realizar la multiplicación interna con el operador `%*%` y la multiplicación externa con el operador `%o%`:
 
 ```r
 die %*% die
@@ -128,9 +104,9 @@ die %o% die
 ## [6,]    6   12   18   24   30   36
 ```
 
-### Functions
+### Funciones
 
-Using a function is pretty simple. Just write the name of the function and then the data you want the function to operate on in parentheses:
+Usar una función es bastante simple. Solo escribe el nombre de la función y luego los datos sobre los que quieres que la función opere entre paréntesis:
 
 ```r
 round(3.1415)
@@ -140,6 +116,77 @@ factorial(3)
 ## 6
 ```
 
-The data that you pass into the function is called the function’s argument. The argument can be raw data, an R object, or even the results of another R function.
+Los datos que pasas a la función se llaman el argumento de la función. El argumento puede ser datos brutos, un objeto de R o incluso los resultados de otra función de R.
 
- When you link functions together, R will resolve them from the innermost operation to the outermost.
+Cuando enlazas funciones juntas, R las resolverá desde la operación más interna hasta la más externa.
+
+Dado que tenemos dos funciones $f$  y $g$, la composición $f(g(x))$ se resuelve primero evaluando $g(x)$ y luego  $f$ sobre el resultado.
+
+$$f(g(x)) = f\left( \underbrace{g(x)}_{\text{operación interna}} \right) \quad \text{operación externa}$$
+
+Por suerte para nosotros, hay una función en R que puede ayudar a "lanzar" el dado. Puedes simular un lanzamiento del dado con la función `sample` de R. `sample` toma dos argumentos: un vector llamado `x` y un número llamado `size`. `sample` devolverá `size` elementos del vector:
+
+```R
+sample(x = 1:4, size = 2)
+## 3 2
+```
+
+Para lanzar tu dado y obtener un número, establece `x` a `die` y toma un elemento de él. Obtendrás un nuevo número cada vez que lo lances:
+
+```R
+sample(x = die, size = 1)
+## 2
+
+sample(x = die, size = 1)
+## 1
+
+sample(x = die, size = 1)
+## 6
+```
+
+Muchas funciones en R toman múltiples argumentos que les ayudan a realizar su trabajo. Puedes darle a una función tantos argumentos como quieras siempre y cuando separes cada argumento con una coma.
+
+Cada argumento en cada función de R tiene un nombre. Puedes especificar qué datos deben ser asignados a qué argumento estableciendo un nombre igual a datos, como en el código anterior. Esto se vuelve importante a medida que comienzas a pasar múltiples argumentos a la misma función; los nombres te ayudan a evitar pasar los datos incorrectos al argumento equivocado. Sin embargo, usar nombres es opcional.
+
+```R
+sample(die, size = 1)
+## 2
+```
+
+A menudo, el nombre del primer argumento no es muy descriptivo, y generalmente es obvio a qué se refiere el primer dato.
+
+¿Pero cómo sabes qué nombres de argumentos usar?
+
+Puedes consultar los argumentos de la función con `args`. Para hacerlo, coloca el nombre de la función entre los paréntesis detrás de `args`. Por ejemplo, puedes ver que la función `round` toma dos argumentos, uno llamado `x` y otro llamado `digits`:
+
+```R
+args(round)
+## function (x, digits = 0) 
+## NULL
+```
+
+¿Notaste que `args` muestra que el argumento `digits` de `round` ya está establecido en 0? Frecuentemente, una función de R tomará argumentos opcionales como `digits`. Estos argumentos se consideran opcionales porque vienen con un valor predeterminado. Puedes pasar un nuevo valor a un argumento opcional si lo deseas, y R usará el valor predeterminado si no lo haces. Por ejemplo, `round` redondeará tu número a 0 decimales por defecto. Para anular el valor predeterminado, proporciona tu propio valor para `digits`:
+
+```R
+round(3.1415)
+## 3
+
+round(3.1415, digits = 2)
+## 3.14
+```
+
+Debes escribir los nombres de cada argumento después del primero o segundo cuando llames a una función con múltiples argumentos.
+
+Si no escribes los nombres de tus argumentos, R coincidirá con tus valores con los argumentos de tu función por orden. Por ejemplo, en el siguiente código, el primer valor, `die`, coincidirá con el primer argumento de `sample`, que se llama `x`. El siguiente valor, `1`, coincidirá con el siguiente argumento, `size`:
+
+```R
+sample(die, 1)
+## 2
+```
+
+A medida que proporciones más argumentos, es más probable que tu orden y el orden de R no coincidan. Como resultado, los valores pueden pasar al argumento equivocado. Los nombres de argumentos evitan esto. R siempre coincidirá con un valor con su nombre de argumento, sin importar dónde aparezca en el orden de argumentos:
+
+```R
+sample(size = 1, x = die)
+## 2
+```
