@@ -134,3 +134,4 @@ El Teorema del Límite Central establece que, en muchas situaciones, cuando se s
 En el caso de lanzar dados, si lanzas un gran número de ellos y sumas sus resultados, la distribución de esa suma tenderá a parecerse más a una distribución gaussiana o campana de Gauss.
 Por lo tanto, a medida que agregas más dados, te acercas más a esta distribución normal.
 En resumen, al agregar más dados, estás sumando más variables aleatorias. Inicialmente, esto aumenta el rango de sumas posibles y cambia la distribución debido a las diferentes combinaciones de resultados. A medida que continúas agregando más y más dados, la distribución tiende a volverse gaussiana debido al Teorema del Límite Central. Esta transición a una forma gaussiana es una manifestación poderosa y fundamental de la teoría de la probabilidad.
+
