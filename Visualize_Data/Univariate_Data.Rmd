@@ -1,0 +1,180 @@
+---
+title: "Univariate Data"
+subtitle: "Cleveland, William S. 1993. Visualizing Data."
+author: '@davescudero'
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(include = TRUE)
+```
+```{r include=FALSE}
+library(ggplot2)
+library(ggcleveland)
+library(kableExtra)
+library(magrittr)
+library(dplyr)
+library(htmltools)
+library(knitr)
+```
+
+La `Figura 2.1` muestra la distancia que recorre una pelota al ser pateada por un jugador de futbol:
+
+- La escala vertical es la distancia
+- La escala horizontal tiene rangos entre 0 y 1
+- Los jugadores estan divididos en 6 partes
+- Los tamaños de las piernas de los jugadores se dividen de menor a mayor de izq a der
+
+La distancia que recorre la pelota son **datos univariados**: medidas de una sola variable cuantitativa. Las medidas estan divididas en grupos por la variable categorica, longitud de pierna
+
+### Gráfico de cuantiles:
+
+#### Cuantiles
+
+Las distancias para cada tipo de pierna ocupan una posicion en la escala de medida. A la coleccion de posiciones se le llama **distribución**  
+
+Los **cuantiles** son esenciales para visualizar distribuciones. El cuantil $f$, $q(f)$, de un conjunto de datos es un valor en la escala de medición de los datos con la propiedad de que aproximadamente una fracción $f$ de los datos son menores o iguales a $q(f)$.
+
+La `Figura 2.1` compara los cuantiles de dos distribuciones. Si los datos siguen la distribución teórica especificada, los puntos en el gráfico Q-Q se alinearán aproximadamente en una línea recta. En este caso, estás comparando los cuantiles de la variable "Distancia" con los cuantiles de una **distribución uniforme**.
+
+En una distribución uniforme, todos los valores tienen la misma probabilidad de ocurrencia.
+
+```{r echo=FALSE}
+data(futbol)
+ggplot(futbol, aes(sample = dist)) +
+  geom_qq(distribution = qunif) +
+  facet_wrap(~ longp, ncol = 4) +
+  labs(title = "Figura 2.1", x = "f-value", y = "Distancia (m)") +
+  theme_minimal()
+```
+El "faceting" (o creación de facetas) es una técnica que divide un gráfico en múltiples paneles basados en una o más variables. Es útil para comparar subgrupos dentro de un conjunto de datos. En este caso, estás dividiendo el gráfico basado en la variable `longp`, lo que te permite ver cómo se distribuyen las longitudes de pierna de cada jugador de futbol.
+
+La creación de gráficos, especialmente con *facetas*, puede ser computacionalmente intensiva, ya que R tiene que calcular los cuantiles y posiciones de cada punto en cada panel. Sin embargo, ggplot2 está optimizado para manejar estas operaciones de manera eficiente.
+
+Los métodos gráficos en esta nota se centran principalmente en visualizar información sobre cuantiles. Los cuantiles proporcionan un mecanismo poderoso para comparar distribuciones debido a que los valores de f ofrecen un estándar de comparación. Al comparar distribuciones, podemos hacerlo al comparar cuantiles con los mismos valores de f.
+
+Se requiere una regla explícita para calcular $q(f)$. Consideremos distancias del primer grupo de futbolitas. Definimos $x_i$, para $i = 1$ a $n$, ordenamos los datos de menor a mayor, de manera que $x_1$ represente la observación más pequeña y $x_n$ la más grande. Para los primeros jugadores, con $n = 58$, tenemos $x_1$ = 30 y $x_58$ = 81. Ahora, definimos $$f(i) = (i - 0.5) / n$$
+Estos valores aumentan de $1/n$, comenzando desde $1/2n$, ligeramente por encima de cero, y terminando en $1 - 1/2n$, ligeramente por debajo de uno. Para los jugadores con piernas < 0.81 m los valores van desde $1/116$ hasta $115/116$ en pasos de $1/58$. Si consideramos $x_i$ como $q(f_i)$.
+```{r echo=FALSE}
+# Obtener la lista de categorías únicas en 'longp'
+categorias <- unique(futbol$longp)
+
+# Filtrar las categorías para incluir solo "< 0.81 m"
+categorias_filtradas <- categorias[categorias == "< 0.81 m"]
+
+# Inicializar un vector para almacenar los valores de f
+f <- numeric(0)
+
+# Calcular valores de f equidistantes para las categorías filtradas
+for (categoria in categorias_filtradas) {
+  datos_categoria <- futbol[futbol$longp == categoria, ]
+  n_categorias <- nrow(datos_categoria)
+  f_categoria <- ((1:n_categorias) - 0.5) / n_categorias
+  f <- c(f, f_categoria)
+}
+
+# Crear el DataFrame con f y x
+df <- data.frame(f = f, x = categorias_filtradas)
+
+# Seleccionar los primeros 5 y últimos 5 valores
+primeros_5 <- head(df, 5)
+ultimos_5 <- tail(df, 5)
+
+# Crear una fila con puntos para representar los valores omitidos
+puntos <- data.frame(lapply(primeros_5, function(x) if(is.numeric(x)) NA else "..."))
+colnames(puntos) <- colnames(primeros_5)
+
+# Combinar las filas
+df_resumen <- bind_rows(primeros_5, puntos, ultimos_5)
+
+# Mostrar la tabla dinámica utilizando kable y kableExtra
+df_resumen %>%
+  kable("html") %>%  # Aquí se establece que los NA se muestren como cadenas vacías
+  kableExtra::kable_styling()
+```
+
+Hasta ahora, $q(f)$ ha sido definida solo para valores de $f$ que son iguales a $f_i$. La definición se extiende a todos los valores de $f$ desde $0$ hasta $1$ mediante **interpolación lineal** y **extrapolación** basada en los valores de $f_i$ y $q(f_i)$.
+
+`Figura 2.2` Ilustra el método usando las primeras alturas de tenor. Los símbolos de trazado son los puntos $(f_i, x_i)$; la interpolación y la extrapolación se muestran mediante segmentos de línea.
+
+
+```{r eval=FALSE, include=FALSE}
+
+# Filtramos el dataframe
+subset_futbol <- futbol[futbol$longp == "< 0.81 m", ]
+
+# Creamos la gráfica Q-Q
+p <- ggplot(subset_futbol, aes(sample = dist)) +
+ stat_qq(distribution = qunif, geom = "point", position = "identity", aes(colour = "data")) +
+  stat_qq_line(distribution = qunif, colour = "red") +
+  ggtitle("Gráfica Q-Q para Tenor 1") +
+  labs(subtitle = "Figura 2.2",
+       x = "f-value",
+       y = "Tenor 1 Height (inches)") +
+  theme_minimal() +
+  scale_color_manual(name = "", values = c("data" = "black"), guide = FALSE)
+
+print(p)
+
+```
+
+```{r echo=FALSE}
+
+# Filtramos el dataframe
+subset_futbol <- futbol[futbol$longp == "< 0.81 m", ]
+
+# Asumiendo que tus datos están en el vector 'data'
+data_ordered <- sort(subset_futbol$dist)
+n <- length(data_ordered)
+f_values <- (1:n) / (n + 1)
+
+# Creamos un dataframe para ggplot
+df <- data.frame(y = data_ordered, x = f_values)
+
+ggplot(df, aes(x = x, y = y)) +
+  geom_line() +
+  geom_point(aes(x = x, y = y), color = "black", shape = 16) +
+  labs(title = "Figura 2.2 Q-Q plot", 
+       subtitle = "Interpolaciones y extrapolaciones mostradas mediante segmentos de línea", 
+       x = "f-value",
+       y = "Distancia ") +
+  theme_minimal()
+
+```
+
+#### Graficando Cuantiles
+
+En un gráfico de cuantiles, $x_i$ se grafica contra $f_i$. En otras palabras, visualizamos los cuantiles $f_i$. Los paneles de la `Figura 2.1` son gráficos de cuantiles del tamaño de las piernas de los jugadores. Los valores interpolados y extrapolados de $q(f)$ no se muestran porque no mejoran apreciablemente nuestra evaluación visual de la distribución de los datos. Más bien, la interpolación o extrapolación se utiliza cuando, para algún otro propósito, necesitamos un cuantil cuyo valor de $f$ no resulta ser uno de los valores de $f_i$.
+
+Graficar mediciones univariadas en un gráfico de cuantiles es una forma simple y efectiva de echar un primer vistazo a su distribución. Primero, se muestran los valores de todos los datos; podemos evaluar tanto el comportamiento general como las ocurrencias inusuales. Y se transmite información sobre los cuantiles.
+
+`Figura 2.1` muestra varias propiedades de los datos de los jugadores...
+
+##### Orden Gráfico y Rejillas de Referencia Visual
+
+La `Figura 2.1` utiliza una convención importante; cuando los paneles de una visualización multi-panel están asociados con una variable ordenada, como el intervalo de tono, la variable aumentará a medida que vayamos de izquierda a derecha y de abajo a arriba. Si la variable ordenada se graficara de alguna manera a lo largo de una escala horizontal, aumentaría al ir de izquierda a derecha; si la variable se graficara de alguna manera a lo largo de una escala vertical, aumentaría al ir de abajo a arriba. El orden gráfico de los paneles simplemente sigue la convención establecida.
+
+La **Figura 2.1** tiene rejillas de referencia visual, las líneas verticales y horizontales en gris. Su propósito no es mejorar la lectura de la escala o la búsqueda en la tabla, que es la determinación de valores numéricos a partir de las escalas; las marcas de graduación son suficientes para la búsqueda en la tabla. Más bien, su propósito es mejorar la comparación de patrones, o gestalts, en diferentes paneles. Al proporcionar una referencia visual común, las rejillas mejoran nuestra comparación de las ubicaciones relativas de características en diferentes paneles [21]. Por ejemplo, en la **Figura 2.1**, las rejillas facilitan ver...
+
+
+## Códigos
+
+[Figura 2.1](#)
+
+<div id="gistContainer" style="display: none;">
+  <script src="https://gist.github.com/davescudero/0de03aad29080dc1b56e4dde63780ebe.js"></script>
+</div>
+
+<script>
+document.querySelector("a").addEventListener("click", function(event) {
+  event.preventDefault();
+  var gist = document.getElementById("gistContainer");
+  if (gist.style.display === "none") {
+    gist.style.display = "block";
+  } else {
+    gist.style.display = "none";
+  }
+});
+</script>
+
