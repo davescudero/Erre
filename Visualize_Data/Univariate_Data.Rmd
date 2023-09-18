@@ -217,6 +217,38 @@ Hay una gran cantidad de información en la `Figura 2.5`. En general, hay una su
 #### Box Plots
 
 Un método para destilar la información en los gráficos q-q es el diagrama de caja de Tukey. En lugar de comparar muchos cuantiles, como en el gráfico q-q, se utiliza un número limitado de cantidades para resumir cada distribución, y estos resúmenes se comparan.
+```{r echo=FALSE}
+# Datos
+data <- data.frame(
+  value = c(0.9, 1.6, 2.26305, 2.55052, 2.61059, 2.69284, 2.78511, 2.80955, 
+            2.94647, 2.96043, 3.05728, 3.15748, 3.18033, 3.20021, 
+            3.20156, 3.24435, 3.33231, 3.34176, 3.3762, 3.39578, 3.4925,
+            3.55195, 3.56207, 3.65149, 3.72746, 3.73338, 3.73869, 
+            3.80469, 3.85224, 3.91386, 3.93034, 4.02351, 4.03947, 
+            4.05481, 4.10111, 4.26249, 4.28782, 4.37586, 4.48811, 
+            4.6001, 4.65677, 4.66167, 4.73211, 4.80803, 4.9812, 5.17246,
+            5.3156, 5.35086, 5.36848, 5.48167, 5.68, 5.98848, 6.2, 7.1, 
+            7.4)
+)
+
+# Crear boxplot
+p <- ggplot(data, aes(x = factor(1), y = value)) +
+  geom_boxplot() +
+  labs(y = "Data", x = "") +
+  theme_minimal() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  annotate("text", x = 1.5, y = c(0.9, 1.6, 3.2, 3.8, 4.65, 6.2, 7.2), 
+           label = c("outside value", "lower adjacent value", 
+                     "lower quartile", "median", "upper quartile", 
+                     "upper adjacent value", "outside values"),
+           hjust = 0, size = 3.5, angle = 15)
+
+print(p)
+
+```
+
 
 ## Códigos
 
