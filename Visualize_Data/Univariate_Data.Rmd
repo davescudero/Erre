@@ -52,9 +52,9 @@ El "faceting" (o creación de facetas) es una técnica que divide un gráfico en
 
 La creación de gráficos, especialmente con *facetas*, puede ser computacionalmente intensiva, ya que R tiene que calcular los cuantiles y posiciones de cada punto en cada panel. Sin embargo, ggplot2 está optimizado para manejar estas operaciones de manera eficiente.
 
-Los métodos gráficos en esta nota se centran principalmente en visualizar información sobre cuantiles. Los cuantiles proporcionan un mecanismo poderoso para comparar distribuciones debido a que los valores de f ofrecen un estándar de comparación. Al comparar distribuciones, podemos hacerlo al comparar cuantiles con los mismos valores de f.
+Los métodos gráficos en esta nota se centran principalmente en visualizar información sobre cuantiles. Los cuantiles proporcionan un mecanismo poderoso para comparar distribuciones debido a que los valores de $f$ ofrecen un estándar de comparación. Al comparar distribuciones, podemos hacerlo al comparar cuantiles con los mismos valores de $f$.
 
-Se requiere una regla explícita para calcular $q(f)$. Consideremos distancias del primer grupo de futbolitas. Definimos $x_i$, para $i = 1$ a $n$, ordenamos los datos de menor a mayor, de manera que $x_1$ represente la observación más pequeña y $x_n$ la más grande. Para los primeros jugadores, con $n = 58$, tenemos $x_1$ = 30 y $x_58$ = 81. Ahora, definimos $$f(i) = (i - 0.5) / n$$
+Se requiere una regla explícita para calcular $q(f)$. Consideremos distancias del primer grupo de futbolitas. Definimos $x_i$, para $i = 1$ a $n$, ordenamos los datos de menor a mayor, de manera que $x_1$ represente la observación más pequeña y $x_n$ la más grande. Para los primeros jugadores, con $n = 58$, tenemos $x_1 = 30$ y $x_{58}$ = 81. Ahora, definimos $$f(i) = (i - 0.5) / n$$
 Estos valores aumentan de $1/n$, comenzando desde $1/2n$, ligeramente por encima de cero, y terminando en $1 - 1/2n$, ligeramente por debajo de uno. Para los jugadores con piernas < 0.81 m los valores van desde $1/116$ hasta $115/116$ en pasos de $1/58$. Si consideramos $x_i$ como $q(f_i)$.
 ```{r echo=FALSE}
 # Obtener la lista de categorías únicas en 'longp'
@@ -155,8 +155,68 @@ Graficar mediciones univariadas en un gráfico de cuantiles es una forma simple 
 
 La `Figura 2.1` utiliza una convención importante; cuando los paneles de una visualización multi-panel están asociados con una variable ordenada, como el intervalo de tono, la variable aumentará a medida que vayamos de izquierda a derecha y de abajo a arriba. Si la variable ordenada se graficara de alguna manera a lo largo de una escala horizontal, aumentaría al ir de izquierda a derecha; si la variable se graficara de alguna manera a lo largo de una escala vertical, aumentaría al ir de abajo a arriba. El orden gráfico de los paneles simplemente sigue la convención establecida.
 
-La **Figura 2.1** tiene rejillas de referencia visual, las líneas verticales y horizontales en gris. Su propósito no es mejorar la lectura de la escala o la búsqueda en la tabla, que es la determinación de valores numéricos a partir de las escalas; las marcas de graduación son suficientes para la búsqueda en la tabla. Más bien, su propósito es mejorar la comparación de patrones, o gestalts, en diferentes paneles. Al proporcionar una referencia visual común, las rejillas mejoran nuestra comparación de las ubicaciones relativas de características en diferentes paneles [21]. Por ejemplo, en la **Figura 2.1**, las rejillas facilitan ver...
+La `Figura 2.1` tiene rejillas de referencia visual, las líneas verticales y horizontales en gris. Su propósito no es mejorar la lectura de la escala o la búsqueda en la tabla, que es la determinación de valores numéricos a partir de las escalas; las marcas de graduación son suficientes para la búsqueda en la tabla. Más bien, su propósito es mejorar la comparación de patrones, o gestalts, en diferentes paneles. Al proporcionar una referencia visual común, las rejillas mejoran nuestra comparación de las ubicaciones relativas de características en diferentes paneles. Por ejemplo, en la `Figura 2.1`, las rejillas facilitan ver...
 
+### Q-Q Plots
+
+El gráfico cuantil-cuantil, o gráfico Q-Q, de Wilk y Gnanadesikan es un método de visualización poderoso para comparar las distribuciones de dos o más conjuntos de mediciones univariadas. Cuando se comparan distribuciones, el objetivo es entender cómo las distribuciones cambian al pasar de un conjunto de datos a otro. Para los jugadores de futbol, el objetivo es entender cómo las distribuciones de la distancia que recorre la pelota cambian segun la longitud de la pierna.
+
+La forma más efectiva de investigar los cambios en las distribuciones es comparando cuantiles correspondientes. Esta fue la perspicaz observación de Wilk y Gnanadesikan, y su invención no podría ser más simple o elegante: dos distribuciones se comparan graficando cuantiles de una distribución contra los cuantiles correspondientes de la otra.
+
+Supongamos que solo hay dos conjuntos de mediciones univariadas que deben compararse. Dejemos que $X(1), \ldots, X(n)$ sea el primer conjunto de datos, ordenados de menor a mayor. Dejemos que $Y(1), \ldots, Y(m)$ sea el segundo, también ordenado. Supongamos que $m \leq n$. Si $m = n$, entonces $Y_i$ y $x_i$ son ambos cuantiles $(i - 0.5) / n$ de sus respectivos conjuntos de datos, por lo que en el gráfico q-q, $y_i$ se grafica contra $x_i$; es decir, los valores ordenados de un conjunto de datos se grafican contra los valores ordenados del otro conjunto. Si $m < n$, entonces $y_i$ es el cuantil $(i - 0.5) / m$ de los datos $y$, y graficamos $Y_i$ contra el cuantil $(i - 0.5) / m$ de los datos $x$, que normalmente debe calcularse mediante interpolación. Con este método, siempre hay $m$ puntos en el gráfico, el número de valores en el conjunto de datos más pequeño. Por supuesto, si $m$ es un número grande, digamos $10^5$, entonces podemos seleccionar menos cuantiles para comparación.
+
+La `Figura 2.3` grafica los cuantiles de los 26 bajos segundos contra los cuantiles de los 21 primeros tenores. El tamaño del conjunto de datos más pequeño es 21, por lo que se comparan 21 cuantiles con valores `f` iguales a `(i - 0.5)/21`. Debido a que algunos de los símbolos de trazado se superponen, solo aparecen 18 puntos distintos en el gráfico. Normalmente, tal superposición requeriría una solución discutida en "jittering" o "temblor", que es la adición de ruido aleatorio uniforme a las coordenadas de los puntos. Pero en un gráfico q-q, los puntos representan lo que en realidad es una curva continua creciente, una función cuantil contra otra, por lo que no es necesario romper la superposición.
+
+Cuando $i = 1$, el valor $f$ es 0.024. El punto en la esquina inferior izquierda de la región de datos es el cuantil 0.024 para los bajos contra el cuantil 0.024 para los tenores. Cuando $i = 21$, el valor $f$ es 0.976. El punto en la esquina superior derecha de la región de datos es el cuantil 0.976 para los bajos contra el cuantil 0.976 para los tenores.
+
+```{r echo=FALSE}
+# Filtrar los datos
+subset_data <- subset(futbol, longp %in% c("< 0.81 m", "0.81 a 0.90 m"))
+
+# Crear el gráfico q-q en ggplot2
+p <- ggplot(subset_data, aes(sample = dist)) +
+  geom_qq(aes(color = longp)) + 
+  geom_qq_line(aes(color = longp)) + 
+  labs(title = "Figure 2.3",
+       x = " Distancia con Long Pierna < 0.81 m",
+       y = "Distancia con Long Pierna 0.81 a 0.90 m") +
+  theme_minimal()
+
+print(p)
+
+```
+La línea en la `Figura 2.3` es $b=t$, donde $b$ representa "0.81 a 0.90 m"  y  $t$ "< 0.81 m". Dejemos que $(t_i,b_i)$ sean las coordenadas de los puntos graficados en el panel. Nuestro objetivo al estudiar el gráfico q-q es determinar cómo se desvían los puntos de la línea $b=t$. Si las distribuciones de las distancias de las distintas lonjgitudes de piernas las mismas, los puntos variarían alrededor de esta línea. Pero no son los mismos. Hay un desplazamiento entre las distribuciones; el patrón subyacente de los puntos es una línea $b=t+c$.
+Antes de interpretar este patrón, haremos un gráfico más para visualizarlo de una manera diferente.
+
+#### Gráficos de Diferencia Media de Tukey
+
+Un gráfico de diferencia media de Tukey, o gráfico m-d, puede añadir sustancialmente a nuestra evaluación visual de un desplazamiento entre dos distribuciones. La `Figura 2.4` es un gráfico m-d derivado del gráfico q-q en la `Figura 2.3`. Las diferencias, $b_i−t_i$, se grafican contra las medias, $\frac{b_i+t_i}{2}$. La línea $b=t$ en el gráfico q-q se convierte en la línea cero en el gráfico m-d, y un desplazamiento se evalúa juzgando las desviaciones de la línea cero. Esto a menudo mejora nuestra percepción de los efectos porque podemos juzgar más fácilmente las desviaciones de una línea horizontal que de una línea con pendiente no nula.
+
+
+```{r echo=FALSE}
+# Dos grupos
+gg_tmd(subset_data, dist, longp) + 
+  labs (title= "Figure 2.4")
+```
+
+Las `Figuras 2.3` y `2.4` muestran que las distribuciones de tenor y bajo difieren de una manera extremadamente simple: los cuantiles de la distribución de bajo son aproximadamente iguales a los cuantiles de la distribución de tenor más una constante de alrededor de 2.5 pulgadas. Hay un desplazamiento aditivo de alrededor de 2.5 pulgadas. La comparación de las dos distribuciones se puede resumir con la simple declaración de que la distribución de las alturas de bajo es alrededor de 2.5 pulgadas mayor. Esta es una buena noticia; ejemplos posteriores mostrarán que los desplazamientos entre distribuciones pueden ser complejos.......
+
+#### Q-Q Plots pareados
+
+El objetivo al analizar los datos del cantante es comparar las distribuciones de todas las partes vocales y determinar los desplazamientos. La `Figura 2.5` muestra los gráficos q-q de todos los pares posibles de partes vocales. Por ejemplo, la segunda fila desde la parte inferior tiene gráficos q-q de los primeros bajos contra todas las demás partes vocales. La segunda columna desde la izquierda también compara la distribución de los primeros bajos con todas las demás, pero ahora los cuantiles de los primeros bajos están en el eje horizontal en lugar del eje vertical. Así, podemos examinar ya sea la segunda fila o columna para comparar los primeros bajos con todas las demás partes vocales........
+
+```{r echo=FALSE}
+# Múltiples grupos
+gg_tmd(futbol, dist, longp, size = 0.5)+
+  labs (title= "Figure 2.5")
+
+```
+
+Hay una gran cantidad de información en la `Figura 2.5`. En general, hay una sugerencia de que los desplazamientos entre pares de distribuciones son aditivos. Pero necesitamos una forma de destilar la información porque hay muchos pares para comparar. Los métodos que vienen ayudarán con la destilación.
+
+#### Box Plots
+
+Un método para destilar la información en los gráficos q-q es el diagrama de caja de Tukey. En lugar de comparar muchos cuantiles, como en el gráfico q-q, se utiliza un número limitado de cantidades para resumir cada distribución, y estos resúmenes se comparan.
 
 ## Códigos
 
@@ -164,6 +224,24 @@ La **Figura 2.1** tiene rejillas de referencia visual, las líneas verticales y 
 
 <div id="gistContainer" style="display: none;">
   <script src="https://gist.github.com/davescudero/0de03aad29080dc1b56e4dde63780ebe.js"></script>
+</div>
+
+<script>
+document.querySelector("a").addEventListener("click", function(event) {
+  event.preventDefault();
+  var gist = document.getElementById("gistContainer");
+  if (gist.style.display === "none") {
+    gist.style.display = "block";
+  } else {
+    gist.style.display = "none";
+  }
+});
+</script>
+
+[Figura 2.2](#)
+
+<div id="gistContainer" style="display: none;">
+  <script src="https://gist.github.com/davescudero/22451ce5ee9e421cc84761ea48a448cc.js"></script>
 </div>
 
 <script>
