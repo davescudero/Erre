@@ -51,3 +51,7 @@ rsconnect/
 # Archivos del sistema
 .DS_Store
 
+# Ignorar la carpeta renv
+renv/
+
+
